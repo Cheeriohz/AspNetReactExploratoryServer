@@ -1,4 +1,5 @@
 ﻿using AspnetCoreBackendExploratory.Services;
+using AspnetCoreBackendExploratory.Services.Contracts.PositionAPIForwardRecords;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -7,9 +8,9 @@ namespace AspnetCoreBackendExploratory.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TemperatureForLocationController : ControllerBase
+    public class GeocodeForwardingController : ControllerBase
     {
-        public TemperatureForLocationController(GeoCodeForwardingService geoService)
+        public GeocodeForwardingController(GeoCodeForwardingService geoService)
         {
             this.geoService = geoService;
         }
@@ -18,9 +19,9 @@ namespace AspnetCoreBackendExploratory.Controllers
 
 
         [HttpGet]
-        public async Task<(double latitude, double longitude)> Get(string location, CancellationToken canceltoken)
+        public async Task<ForwardData[]> Get(string location, CancellationToken canceltoken)
         {
-            return await this.geoService.RetrieveLatLong(location, canceltoken);
+            return await this.geoService.RetrieveGeocodeForwardData(location, canceltoken);
         }
 
     }

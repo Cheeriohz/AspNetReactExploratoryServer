@@ -11,13 +11,13 @@ namespace AspnetCoreBackendExploratory.Services
         public GeoCodeForwardingService(string apiKey) => this.apiKey = apiKey;
 
 
-        private readonly ConcurrentDictionary<string, (double latitude, double longiture)> cachedLocations = new (StringComparer.OrdinalIgnoreCase);
+        private readonly ConcurrentDictionary<string, ForwardData[]> cachedLocations = new (StringComparer.OrdinalIgnoreCase);
 
         private readonly string apiKey;
-        public async Task<(double latitude, double longitude)> RetrieveLatLong(string location, CancellationToken cancellationToken)
+        public async Task<ForwardData[]> RetrieveGeocodeForwardData(string location, CancellationToken cancellationToken)
         {
-            if(this.cachedLocations.TryGetValue(location, out (double latitude, double longitude) latlong))
-                return latlong;
+            if(this.cachedLocations.TryGetValue(location, out ForwardData[] geocodeData))
+                return geocodeData;
 
             using HttpClient client = new()
             {
@@ -36,13 +36,12 @@ namespace AspnetCoreBackendExploratory.Services
  
             if(aggregateData.data.Length > 0)
             {
-                (double longitude, double latitude) value = (aggregateData.data[0].longitude, aggregateData.data[0].latitude);
-                this.cachedLocations[location] = value;
+                this.cachedLocations[location] = aggregateData.data;
 
-                return value;
+                return aggregateData.data;
             }
 
-            return (0, 0);
+            return aggregateData.data;
 
         }
 
